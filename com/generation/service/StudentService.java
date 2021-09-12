@@ -27,10 +27,4 @@ public class StudentService {
         students.forEach((K, V) -> System.out.println(V));
     }
 
-    public void enrollToCourse(String studentId, Course course) {
-        if (students.containsKey(studentId)) {
-            students.get(studentId).enrollToCourse(course);
-        }
-    }
-
 }

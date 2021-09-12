@@ -60,7 +60,18 @@ public class CourseService {
         if (!enrolledStudents.containsKey(courseId)) {
             enrolledStudents.put(courseId, new ArrayList<>());
         }
-        enrolledStudents.get(courseId).add(student);
+        if(!enrolledStudents.get(courseId).contains(student)){
+            enrolledStudents.get(courseId).add(student);
+        }
+    }
+
+    public boolean isStudentEnrollerd(String courseId, Student student){
+        try {
+            enrolledStudents.get(courseId).contains(student);
+            return true;
+        } catch (java.lang.NullPointerException e) {
+            return false;
+        }
     }
 
     public void showEnrolledStudents(String courseId) {
@@ -74,6 +85,7 @@ public class CourseService {
 
 
     public void showSummary() {
+        String courseId;
         System.out.println("Available Courses:");
         for (String key : courses.keySet()) {
             Course course = courses.get(key);
@@ -83,27 +95,47 @@ public class CourseService {
         for (String key : enrolledStudents.keySet()) {
             List<Student> students = enrolledStudents.get(key);
             System.out.println("Students on Course " + key + ": ");
+            courseId = key;
             for (Student student : students) {
-                System.out.println(student);
+                System.out.print(student);
+                //displaying the grading for each course per student
+                String grade =  student.isGradedBefore(courseId) ? Integer.toString(student.getCourseGrades().get(courseId)) : "Not Graded";
+                System.out.println(" : Grade - " + grade);
             }
         }
     }
 
     public void displayAverageGrade() {
-        for (String key : enrolledStudents.keySet()) {
-            List<Student> students = enrolledStudents.get(key);
+
+        for (String key : enrolledStudents.keySet()) {   //get set of courses ids for enrolled courses
+            int noOfNotGradedStudents = 0;
             double totalGrade = 0;
+            double averageGrade = 0;
+
+            List<Student> students = enrolledStudents.get(key);   //no of students who enrolled to this course
 
             for (Student student : students) {
                 try {
+                    if(!student.isGradedBefore(key)){
+                        noOfNotGradedStudents++;
+                    }
                     totalGrade += student.getCourseGrades().get(key);
-                } catch (java.lang.NullPointerException e) {
-                    System.out.println("Gradings are not found");
-                    return;
-                }
+                } catch (java.lang.NullPointerException ignored) {}
             }
-            System.out.print("Average grade for " + getCourseName(key) + " - ");
-            System.out.println(String.format("%.2f", totalGrade / students.size()));
+
+            if(noOfNotGradedStudents == students.size()){
+                System.out.println("Gradings are not available for " + key);
+                continue;
+            }
+
+            try{
+                averageGrade = totalGrade / (students.size() - noOfNotGradedStudents);
+            } catch (ArithmeticException e){
+                System.out.println("This exception should never reached. Something went wrong...");
+            }
+
+            System.out.print("Average grade for " + getCourseName(key) + " (" + key + ") - "  );
+            System.out.println(String.format("%.2f",  averageGrade));
 
         }
     }
