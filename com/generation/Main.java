@@ -164,6 +164,7 @@ public class Main {
 
         System.out.println(course);
         courseService.enrollStudent(courseId, student);
+        studentService.enrollToCourse(studentId, course);
         System.out.println("Student with ID: " + studentId + " - Enrolled successfully to " + courseService.getCourseName(courseId));
     }
 
